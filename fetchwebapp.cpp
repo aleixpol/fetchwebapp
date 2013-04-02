@@ -54,11 +54,6 @@ void FetchWebApp::fetch(const QUrl& url)
     m_manager.get(QNetworkRequest(url));
 }
 
-int FetchWebApp::userId()
-{
-    return 42;
-}
-
 void FetchWebApp::manifestoFetched(QNetworkReply* reply)
 {
     m_pending--;

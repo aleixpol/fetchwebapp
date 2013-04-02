@@ -14,7 +14,6 @@ public:
     FetchWebApp();
     virtual ~FetchWebApp();
     void fetch(const QUrl& url);
-    int userId();
 
 private slots:
     void manifestoFetched(QNetworkReply* reply);
