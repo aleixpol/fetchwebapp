@@ -22,6 +22,9 @@ FetchWebApp::FetchWebApp()
     QString ourTitle = "Web Apps";
     QSqlQuery queryFindTagId("SELECT id FROM channels WHERE title=:ourtitle;");
     queryFindTagId.bindValue(":ourtitle", ourTitle);
+    ok = queryFindTagId.exec();
+    Q_ASSERT(ok);
+
     if(!queryFindTagId.first()) {
         QSqlQuery queryTag( "INSERT INTO channels (partner, active, name, description) "
                             "VALUES (:partner, :active, :name, :description) "
