@@ -21,14 +21,15 @@ FetchWebApp::FetchWebApp()
     Q_ASSERT(ok);
     
     QString ourName = "Web Apps";
-    QSqlQuery queryFindTagId("SELECT id FROM channels WHERE name=:name;");
+    QSqlQuery queryFindTagId;
+    queryFindTagId.prepare("SELECT id FROM channels WHERE name=:name;");
     queryFindTagId.bindValue(":name", ourName);
     ok = queryFindTagId.exec();
-    if(!ok) qDebug() << "error" << queryFindTagId.lastError();
     Q_ASSERT(ok);
 
     if(!queryFindTagId.first()) {
-        QSqlQuery queryTag( "INSERT INTO channels (partner, active, name, description) "
+        QSqlQuery queryTag;
+        queryTag.prepare(   "INSERT INTO channels (partner, active, name, description) "
                             "VALUES (:partner, :active, :name, :description) "
                             "RETURNING id;");
         queryTag.bindValue(":partner", 1); //1 is KDE
@@ -61,7 +62,8 @@ void FetchWebApp::manifestoFetched(QNetworkReply* reply)
     QVariantMap data = parser.parse(reply->readAll()).toMap();
 
     QUrl url = reply->url();
-    QSqlQuery assetExists("SELECT id FROM assets WHERE name=:name");
+    QSqlQuery assetExists;
+    assetExists.prepare("SELECT id FROM assets WHERE name=:name");
     assetExists.bindValue(":name", data["name"]);
     bool ok = assetExists.exec();
     Q_ASSERT(ok);
@@ -98,7 +100,8 @@ void FetchWebApp::manifestoFetched(QNetworkReply* reply)
     
     int assetId = query.value(0).toInt();
     if(!alreadyPresent) {
-        QSqlQuery addQuery("INSERT INTO channelAssets (channel, asset) VALUES (:channelId, :assetId)");
+        QSqlQuery addQuery;
+        addQuery.prepare("INSERT INTO channelAssets (channel, asset) VALUES (:channelId, :assetId)");
         addQuery.bindValue(":channelId", m_channelId);
         addQuery.bindValue(":assetId", assetId);
         ok = addQuery.exec();
@@ -120,11 +123,13 @@ void FetchWebApp::cleanup()
     while(removeOldIds.next()) {
         int id = removeOldIds.value(0).toInt();
         if(m_entered.contains(id)) {
-            QSqlQuery removeQuery("DELETE * FROM channelAssets WHERE asset=:id;");
+            QSqlQuery removeQuery;
+            removeQuery.prepare("DELETE * FROM channelAssets WHERE asset=:id;");
             ok = removeQuery.exec();
             Q_ASSERT(ok);
 
-            QSqlQuery removeAssetQuery("DELETE * FROM assets WHERE id=:id;");
+            QSqlQuery removeAssetQuery;
+            removeAssetQuery.prepare("DELETE * FROM assets WHERE id=:id;");
             ok = removeAssetQuery.exec();
             Q_ASSERT(ok);
         }
