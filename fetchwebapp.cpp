@@ -85,16 +85,16 @@ void FetchWebApp::manifestoFetched(QNetworkReply* reply)
     QVariantMap icons = data["icons"].toMap();
     query.bindValue(":license", 4);
     query.bindValue(":author", 0);
-    query.bindValue(":name", data["name"].toString());
-    query.bindValue(":description", data["description"].toString());
-    query.bindValue(":version", data["version"].toString());
+    query.bindValue(":name", data["name"]);
+    query.bindValue(":description", data["description"]);
+    query.bindValue(":version", data["version"]);
     query.bindValue(":path", url.toString());
     if(icons.contains("128"))
         query.bindValue(":image", QUrl("http://"+url.host()+"/"+icons["128"].toString()));
     else
         query.bindValue(":image", QString());
     query.bindValue(":active", true);
-    query.bindValue(":externid", reply->url().toString());
+    query.bindValue(":externid", reply->url());
     ok = query.exec();
     Q_ASSERT(ok);
     
