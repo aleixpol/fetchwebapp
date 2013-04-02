@@ -90,12 +90,11 @@ void FetchWebApp::manifestoFetched(QNetworkReply* reply)
     query.bindValue(":version", data["version"]);
     query.bindValue(":path", url.toString());
     if(icons.contains("128"))
-        query.bindValue(":image", QUrl("http://"+url.host()+"/"+icons["128"].toString()));
+        query.bindValue(":image", QString("http://"+url.host()+"/"+icons["128"].toString()));
     else
         query.bindValue(":image", QString());
     query.bindValue(":active", true);
-    query.bindValue(":externid", reply->url());
-    ok = query.exec();
+    query.bindValue(":externid", reply->url().toString());
     Q_ASSERT(ok);
     
     int assetId = query.value(0).toInt();
