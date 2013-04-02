@@ -4,6 +4,7 @@
 #include <QNetworkReply>
 #include <QUrl>
 #include <QSqlQuery>
+#include <QSqlError>
 #include <QDebug>
 
 #include <qjson/parser.h>
@@ -23,6 +24,7 @@ FetchWebApp::FetchWebApp()
     QSqlQuery queryFindTagId("SELECT id FROM channels WHERE title=:ourtitle;");
     queryFindTagId.bindValue(":ourtitle", ourTitle);
     ok = queryFindTagId.exec();
+    if(!ok) qDebug() << "error" << queryFindTagId.lastError();
     Q_ASSERT(ok);
 
     if(!queryFindTagId.first()) {
