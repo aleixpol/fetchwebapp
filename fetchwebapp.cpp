@@ -95,6 +95,7 @@ void FetchWebApp::manifestoFetched(QNetworkReply* reply)
         query.bindValue(":image", QString());
     query.bindValue(":active", true);
     query.bindValue(":externid", reply->url().toString());
+    ok = query.exec() && query.first();
     Q_ASSERT(ok);
     
     int assetId = query.value(0).toInt();
