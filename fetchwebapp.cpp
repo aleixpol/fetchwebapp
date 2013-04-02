@@ -20,9 +20,9 @@ FetchWebApp::FetchWebApp()
     bool ok = db.open();
     Q_ASSERT(ok);
     
-    QString ourTitle = "Web Apps";
-    QSqlQuery queryFindTagId("SELECT id FROM channels WHERE title=:ourtitle;");
-    queryFindTagId.bindValue(":ourtitle", ourTitle);
+    QString ourName = "Web Apps";
+    QSqlQuery queryFindTagId("SELECT id FROM channels WHERE name=:name;");
+    queryFindTagId.bindValue(":name", ourName);
     ok = queryFindTagId.exec();
     if(!ok) qDebug() << "error" << queryFindTagId.lastError();
     Q_ASSERT(ok);
@@ -33,7 +33,7 @@ FetchWebApp::FetchWebApp()
                             "RETURNING id;");
         queryTag.bindValue(":partner", 1); //1 is KDE
         queryTag.bindValue(":active", true);
-        queryTag.bindValue(":name", ourTitle);
+        queryTag.bindValue(":name", ourName);
         queryTag.bindValue(":description", QString());
         ok = queryTag.exec() && queryTag.first();
         Q_ASSERT(ok);
