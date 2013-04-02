@@ -2,6 +2,7 @@
 #define FETCHWEBAPP_H
 
 #include <QObject>
+#include <QSet>
 #include <QNetworkAccessManager>
 
 class QUrl;
@@ -22,8 +23,12 @@ signals:
     void done();
 
 private:
+    void cleanup();
+
     QNetworkAccessManager m_manager;
     int m_pending;
+    QSet<int> m_entered;
+    int m_channelId;
 };
 
 #endif // FETCHWEBAPP_H
