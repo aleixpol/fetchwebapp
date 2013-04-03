@@ -20,6 +20,8 @@ FetchWebApp::FetchWebApp()
     bool ok = db.open();
     Q_ASSERT(ok);
     
+    QSqlQuery("update batchJobsInProgress set doWork = true where job = 'webapps'");
+    
     QString ourName = "Web Apps";
     QSqlQuery queryFindTagId;
     queryFindTagId.prepare("SELECT id FROM channels WHERE name=:name;");
@@ -141,5 +143,6 @@ void FetchWebApp::cleanup()
         }
     }
     
+    QSqlQuery("update batchJobsInProgress set doWork = false where job = 'webapps'");
     emit done();
 }
