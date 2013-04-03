@@ -11,7 +11,7 @@
 
 FetchWebApp::FetchWebApp()
     : m_pending(0)
-    , m_channelId(-1)
+    , m_tagId(-1)
 {
     QSqlDatabase db(QSqlDatabase::addDatabase("QPSQL"));
     db.setDatabaseName("bodega");
@@ -20,12 +20,12 @@ FetchWebApp::FetchWebApp()
     bool ok = db.open();
     Q_ASSERT(ok);
     
-    QSqlQuery("update batchJobsInProgress set doWork = true where job = 'webapps'");
+    QSqlQuery("UPDATE batchJobsInProgress SET doWork = true WHERE job = 'webapps'");
     
     QString ourName = "Web Apps";
     QSqlQuery queryFindTagId;
-    queryFindTagId.prepare("SELECT id FROM channels WHERE name=:name;");
-    queryFindTagId.bindValue(":name", ourName);
+    queryFindTagId.prepare("SELECT id FROM tags WHERE title=:title;");
+    queryFindTagId.bindValue(":title", ourName);
     ok = queryFindTagId.exec();
     Q_ASSERT(ok);
 
@@ -40,17 +40,25 @@ FetchWebApp::FetchWebApp()
         queryTag.bindValue(":description", ourName);
         ok = queryTag.exec() && queryTag.first();
         Q_ASSERT(ok);
-        m_channelId = queryTag.value(0).toInt();
+        int channelId = queryTag.value(0).toInt();
         
         QSqlQuery channelToDevice;
         channelToDevice.prepare("INSERT INTO deviceChannels (device, channel) VALUES ('VIVALDI-1', :channelId)");
-        channelToDevice.bindValue(":channelId", m_channelId);
+        channelToDevice.bindValue(":channelId", channelId);
         ok = channelToDevice.exec();
         Q_ASSERT(ok);
-    } else
-        m_channelId = queryFindTagId.value(0).toInt();
 
-    Q_ASSERT(m_channelId>=0);
+        // 1->KDE, 4->category
+        QSqlQuery addTag;
+        addTag.prepare("INSERT INTO tags (partner, type, title) VALUES (1, 4, :title) RETURNING id;");
+        addTag.bindValue(":title", ourName);
+        ok = addTag.exec() && addTag.first();
+        Q_ASSERT(ok);
+        m_tagId = addTag.value(0).toInt();
+    } else
+        m_tagId = queryFindTagId.value(0).toInt();
+
+    Q_ASSERT(m_tagId>0);
     connect(&m_manager, SIGNAL(finished(QNetworkReply*)), SLOT(manifestoFetched(QNetworkReply*)));
 }
 
@@ -112,9 +120,9 @@ void FetchWebApp::manifestoFetched(QNetworkReply* reply)
         assetId = query.value(0).toInt();
         
         QSqlQuery addQuery;
-        addQuery.prepare("INSERT INTO channelAssets (channel, asset) VALUES (:channelId, :assetId);");
-        addQuery.bindValue(":channelId", m_channelId);
+        addQuery.prepare("INSERT INTO assetTags (asset, tag) VALUES (:assetId, :tagId);");
         addQuery.bindValue(":assetId", assetId);
+        addQuery.bindValue(":tagId", m_tagId);
         ok = addQuery.exec();
         Q_ASSERT(ok);
     }
@@ -128,8 +136,8 @@ void FetchWebApp::manifestoFetched(QNetworkReply* reply)
 void FetchWebApp::cleanup()
 {
     QSqlQuery removeOldIds;
-    removeOldIds.prepare("SELECT asset FROM channelAssets WHERE channel=:channelId;");
-    removeOldIds.bindValue(":channelId", m_channelId);
+    removeOldIds.prepare("SELECT asset FROM assetTags WHERE tag=:tagId;");
+    removeOldIds.bindValue(":tagId", m_tagId);
     bool ok = removeOldIds.exec();
     Q_ASSERT(ok);
     

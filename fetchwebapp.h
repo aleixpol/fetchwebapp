@@ -27,7 +27,7 @@ private:
     QNetworkAccessManager m_manager;
     int m_pending;
     QSet<int> m_entered;
-    int m_channelId;
+    int m_tagId;
 };
 
 #endif // FETCHWEBAPP_H
