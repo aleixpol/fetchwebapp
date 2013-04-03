@@ -41,6 +41,12 @@ FetchWebApp::FetchWebApp()
         ok = queryTag.exec() && queryTag.first();
         Q_ASSERT(ok);
         m_channelId = queryTag.value(0).toInt();
+        
+        QSqlQuery channelToDevice;
+        channelToDevice.prepare("INSERT INTO deviceChannels (device, channel) VALUES ('VIVALDI-1', :channelId)");
+        channelToDevice.bindValue(":channelId", m_channelId);
+        ok = channelToDevice.exec();
+        Q_ASSERT(ok);
     } else
         m_channelId = queryFindTagId.value(0).toInt();
 
