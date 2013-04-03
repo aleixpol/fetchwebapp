@@ -106,7 +106,6 @@ void FetchWebApp::manifestoFetched(QNetworkReply* reply)
     query.bindValue(":externid", reply->url().toString());
     ok = query.exec();
     Q_ASSERT(ok);
-    qDebug() << (alreadyPresent ? "updated" : "added") << assetId;
     if(!alreadyPresent) {
         ok = query.first();
         Q_ASSERT(ok);
@@ -119,6 +118,7 @@ void FetchWebApp::manifestoFetched(QNetworkReply* reply)
         ok = addQuery.exec();
         Q_ASSERT(ok);
     }
+    qDebug() << (alreadyPresent ? "updated" : "added") << assetId;
     
     m_entered.insert(assetId);
     if(m_pending==0)
