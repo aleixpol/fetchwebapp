@@ -72,7 +72,7 @@ void FetchWebApp::manifestoFetched(QNetworkReply* reply)
     bool alreadyPresent = assetExists.first();
     if(alreadyPresent) {
         query.prepare("UPDATE assets "
-                  "SET name = :name, license = :license, author = :author, path = :path, active = :active "
+                  "SET name = :name, license = :license, author = :author, path = :path, active = :active, "
                   "version = :version, externid = :externid, image = :image, description = :description "
                   "WHERE id = :id "
                   "RETURNING id;");
