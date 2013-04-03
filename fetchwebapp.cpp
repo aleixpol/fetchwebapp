@@ -35,7 +35,7 @@ FetchWebApp::FetchWebApp()
         queryTag.bindValue(":partner", 1); //1 is KDE
         queryTag.bindValue(":active", true);
         queryTag.bindValue(":name", ourName);
-        queryTag.bindValue(":description", QString());
+        queryTag.bindValue(":description", ourName);
         ok = queryTag.exec() && queryTag.first();
         Q_ASSERT(ok);
         m_channelId = queryTag.value(0).toInt();
@@ -98,9 +98,10 @@ void FetchWebApp::manifestoFetched(QNetworkReply* reply)
     query.bindValue(":externid", reply->url().toString());
     ok = query.exec();
     Q_ASSERT(ok);
-    
+    qDebug() << (alreadyPresent ? "updated" : "added") << assetId;
     if(!alreadyPresent) {
-        query.first();
+        ok = query.first();
+        Q_ASSERT(ok);
         assetId = query.value(0).toInt();
         
         QSqlQuery addQuery;
@@ -126,7 +127,8 @@ void FetchWebApp::cleanup()
     
     while(removeOldIds.next()) {
         int id = removeOldIds.value(0).toInt();
-        if(m_entered.contains(id)) {
+        if(!m_entered.contains(id)) {
+            qDebug() << "removing..." << id;
             QSqlQuery removeQuery;
             removeQuery.prepare("DELETE * FROM channelAssets WHERE asset=:id;");
             ok = removeQuery.exec();
