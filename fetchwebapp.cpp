@@ -70,12 +70,13 @@ void FetchWebApp::manifestoFetched(QNetworkReply* reply)
 
     QSqlQuery query;
     bool alreadyPresent = assetExists.first();
+    int assetId = -1;
     if(alreadyPresent) {
         query.prepare("UPDATE assets "
                   "SET name = :name, license = :license, author = :author, path = :path, active = :active, "
                   "version = :version, externid = :externid, image = :image, description = :description "
-                  "WHERE id = :id "
-                  "RETURNING id;");
+                  "WHERE id = :id;");
+        assetId = assetExists.value(0).toInt();
         query.bindValue(":id", assetExists.value(0));
     } else {
         query.prepare("INSERT INTO assets (license, author, name, description, version, path, image, active, externid) "
@@ -95,11 +96,13 @@ void FetchWebApp::manifestoFetched(QNetworkReply* reply)
         query.bindValue(":image", QString());
     query.bindValue(":active", true);
     query.bindValue(":externid", reply->url().toString());
-    ok = query.exec() && query.first();
+    ok = query.exec();
     Q_ASSERT(ok);
     
-    int assetId = query.value(0).toInt();
     if(!alreadyPresent) {
+        query.first();
+        assetId = query.value(0).toInt();
+        
         QSqlQuery addQuery;
         addQuery.prepare("INSERT INTO channelAssets (channel, asset) VALUES (:channelId, :assetId);");
         addQuery.bindValue(":channelId", m_channelId);
