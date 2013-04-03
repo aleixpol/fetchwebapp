@@ -63,7 +63,7 @@ void FetchWebApp::manifestoFetched(QNetworkReply* reply)
 
     QUrl url = reply->url();
     QSqlQuery assetExists;
-    assetExists.prepare("SELECT id FROM assets WHERE name=:name");
+    assetExists.prepare("SELECT id FROM assets WHERE name=:name;");
     assetExists.bindValue(":name", data["name"]);
     bool ok = assetExists.exec();
     Q_ASSERT(ok);
@@ -72,8 +72,8 @@ void FetchWebApp::manifestoFetched(QNetworkReply* reply)
     bool alreadyPresent = assetExists.first();
     if(alreadyPresent) {
         query.prepare("UPDATE assets "
-                  "SET name = :name, license = :license, author = :author,"
-                  "version = :version, externid = :externid, image = :image, description = :description,  "
+                  "SET name = :name, license = :license, author = :author, path = :path, active = :active "
+                  "version = :version, externid = :externid, image = :image, description = :description "
                   "WHERE id = :id "
                   "RETURNING id;");
         query.bindValue(":id", assetExists.value(0));
