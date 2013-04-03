@@ -101,7 +101,7 @@ void FetchWebApp::manifestoFetched(QNetworkReply* reply)
     int assetId = query.value(0).toInt();
     if(!alreadyPresent) {
         QSqlQuery addQuery;
-        addQuery.prepare("INSERT INTO channelAssets (channel, asset) VALUES (:channelId, :assetId)");
+        addQuery.prepare("INSERT INTO channelAssets (channel, asset) VALUES (:channelId, :assetId);");
         addQuery.bindValue(":channelId", m_channelId);
         addQuery.bindValue(":assetId", assetId);
         ok = addQuery.exec();
@@ -115,7 +115,8 @@ void FetchWebApp::manifestoFetched(QNetworkReply* reply)
 
 void FetchWebApp::cleanup()
 {
-    QSqlQuery removeOldIds("SELECT asset FROM channelAssets WHERE channel=:channelId;");
+    QSqlQuery removeOldIds;
+    removeOldIds.prepare("SELECT asset FROM channelAssets WHERE channel=:channelId;");
     removeOldIds.bindValue(":channelId", m_channelId);
     bool ok = removeOldIds.exec();
     Q_ASSERT(ok);
