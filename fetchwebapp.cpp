@@ -55,6 +55,13 @@ FetchWebApp::FetchWebApp()
         ok = addTag.exec() && addTag.first();
         Q_ASSERT(ok);
         m_tagId = addTag.value(0).toInt();
+
+        QSqlQuery addTagToChannel;
+        addTagToChannel.prepare("INSERT INTO channelTags (channel, tag) VALUES (:channelId, :tagId)");
+        addTagToChannel.bindValue(":channelId", channelId);
+        addTagToChannel.bindValue(":tagId", m_tagId);
+        ok = addTagToChannel.exec();
+        Q_ASSERT(ok);
     } else
         m_tagId = queryFindTagId.value(0).toInt();
 
