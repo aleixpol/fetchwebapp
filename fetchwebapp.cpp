@@ -50,8 +50,7 @@ FetchWebApp::FetchWebApp()
 
         // 1->KDE, 4->category
         QSqlQuery addTag;
-        addTag.prepare("INSERT INTO tags (partner, type, title) VALUES (1, 4, :title) RETURNING id;");
-        addTag.bindValue(":title", ourName);
+        addTag.prepare("INSERT INTO tags (partner, type, title) VALUES (1, 7, 'text/html') RETURNING id;");
         ok = addTag.exec() && addTag.first();
         Q_ASSERT(ok);
         m_tagId = addTag.value(0).toInt();
